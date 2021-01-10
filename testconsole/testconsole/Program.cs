@@ -54,18 +54,23 @@ namespace testconsole
             try
             {
                 IsBusy = true;
-                await Task.Run(() =>
-                {
-                    for (long i = 0; i < 100000000; i++)
-                    {
-                        bigint += (i % 250) ^ 50 % 100;
-                    }                  
-                });
+                await DoRandomHeavyCalc();
             }
             finally
             {
                 IsBusy = false;
             }
+        }
+
+        static Task DoRandomHeavyCalc()
+        {
+            return Task.Run(() =>
+            {
+                for (long i = 0; i < 100000000; i++)
+                {
+                    bigint += (i % 250) ^ 50 % 100;
+                }
+            });
         }
     }
 }
