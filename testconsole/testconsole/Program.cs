@@ -5,60 +5,72 @@ using System.Threading.Tasks;
 
 namespace testconsole
 {
+    public enum Status
+    {
+        None,
+        Busy,
+        Done
+    }
+
     class Program
     {
-        static bool busy = false;
-        static bool IsBusy
+        static Status busy = Status.None;
+        static Status IsBusy
         {
             get => busy;
             set
             {
-                if (!value)
-                    Console.WriteLine("busy = false");
+                if (value == Status.Done)
+                    Console.WriteLine("IsBusy.Set -> busy = Status.Done");
                 busy = value;
             }
         }
         static BigInteger bigint = 0;
         
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Start");
-            Run();
-            PollBusy();
-            Console.WriteLine($"End, isbusy: {IsBusy}");
+
+            // Choose either -> Thread should definitely be async
+            new Thread(PollBusy).Start();
+            //PollBusyTask().Start();
+
+            await RunAsync();
+            Console.WriteLine($"End, IsBusy: {IsBusy}");
             Console.ReadLine();
         }
 
-        static async void Run()
-        {
-            await RunAsync();
-        }
+        static Task PollBusyTask()  => new Task(()
+            => {
+                    while (IsBusy != Status.Done)
+                    {
+                        Console.WriteLine($"Busy: {IsBusy}");
+                        Thread.Sleep(1000);
+                    }
+                });
 
-        static async void PollBusy()
+        static void PollBusy()
         {
-            await Task.Run(() =>
+            while (IsBusy != Status.Done)
             {
-                while (IsBusy)
-                {
-                    Console.WriteLine($"Busy: {IsBusy}");
-                    Thread.Sleep(1000);
-                }
-            });
+                Console.WriteLine($"[PollBusy()] Busy: {IsBusy}");
+                Thread.Sleep(1000);
+            }
         }
 
         static async Task RunAsync()
         {
-            if (IsBusy)
+            if (IsBusy == Status.Done)
                 return;
 
             try
             {
-                IsBusy = true;
+                IsBusy = Status.Busy;
                 await DoRandomHeavyCalc();
             }
             finally
             {
-                IsBusy = false;
+                IsBusy = Status.Done;
             }
         }
 
