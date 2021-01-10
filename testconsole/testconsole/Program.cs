@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Dynamic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,7 +32,6 @@ namespace testconsole
         static async void Run()
         {
             await RunAsync();
-            //Console.WriteLine($"Run Done, IsBusy: {IsBusy}");
         }
 
         static async void PollBusy()
@@ -73,10 +67,5 @@ namespace testconsole
                 IsBusy = false;
             }
         }
-    }
-
-    class TestClass
-    {
-        public Task<bool> ReturnTrue() => Task.Run(() => true);
     }
 }
